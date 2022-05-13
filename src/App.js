@@ -1,24 +1,32 @@
 import logo from './logo.svg';
 import './App.css';
+import ShowCard from './components/showCard';
+import request from './services/apiService';
+import { useEffect, useState } from 'react';
+import { ThemeProvider } from '@material-ui/core';
+import theme from './themes';
 
 function App() {
+  const [ shows, setShows ] = useState([])
+
+  const gets = async () => {
+    const res = await request({
+      type: 'get',
+      url: 'https://api.tvmaze.com/shows'
+    })
+    setShows(res.data)
+  }  
+
+  useEffect(() => {
+    gets()
+  }, [])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ThemeProvider theme={  theme }>
+      <div className="App">
+        {shows.length > 0 && <ShowCard show={ shows[219] } />}
+      </div>
+    </ThemeProvider>
   );
 }
 
