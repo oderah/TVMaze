@@ -68,8 +68,6 @@ const parseRuntime = runtime => {
 export const ShowCard = props => {
     const { show } = props
 
-    console.info(show)
-
     const [ isHovering, setIsHovering ] = useState(false)
 
     const classes = useStyles()
@@ -83,6 +81,9 @@ export const ShowCard = props => {
 
     const summary = parse(show.summary)
     const runtime = parseRuntime(show.runtime)
+    const genres = show.genres && show.genres.length > 0
+                    ? show.genres.reduce((acc, val) => acc += ', ' + val)
+                    : null
     const isAiring = 'Running' === show.status
                     ? 'airing'
                     : 'completed'
@@ -107,13 +108,13 @@ export const ShowCard = props => {
 
             <div id='showHeader'>
                 {/* Name */}
-                <Typography variant='h2'>{ show.name }</Typography>&nbsp;
+                <Typography variant='h2'>{ show.id }</Typography>&nbsp;
                 <Typography variant='body2'>{ isAiring }</Typography>
             </div>
 
             {/* Genres */}
             <Typography variant='body2' className={ classes.emphasis }>
-                { show.genres.reduce((acc, val) => acc += ', ' + val) }
+                { genres }
             </Typography>
 
             {
