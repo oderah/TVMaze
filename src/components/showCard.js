@@ -16,6 +16,13 @@ const useStyles = makeStyles(theme => ({
         '& #content': {
             textAlign: 'left'
         },
+        '& #summary': {
+            fontSize: theme.typography.body2.fontSize,
+            fontFamily: theme.typography.body2.fontFamily,
+            fontWeight: theme.typography.body2.fontWeight,
+            lineHeight: theme.typography.body2.lineHeight,
+            letterSpacing: theme.typography.body2.letterSpacing,
+        },
         '& hr': {
             opacity: 0.6
         },
@@ -124,7 +131,9 @@ export const ShowCard = props => {
 
                     {/* Summary */}
                     <hr />
-                    { summary }
+                    <div id='summary'>
+                        { summary }
+                    </div>
                 </Fragment>
             }
         </CardContent>
