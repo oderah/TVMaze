@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { Fragment, useState } from 'react'
 import { Card, CardContent, CardMedia, makeStyles, Typography } from '@material-ui/core'
 import parse from 'html-react-parser'
 import ImgPlaceHolder from '../static/image-placeholder.png'
@@ -167,6 +167,10 @@ export const ShowCard = props => {
                         </strong>
                         : null
 
+    const officialSite = show.officialSite
+                            ? show.officialSite
+                            : null
+
     const onMouseEnter = e => {
         e.preventDefault()
         setIsHovering(true)
@@ -216,16 +220,35 @@ export const ShowCard = props => {
                         { genres }
                     </Typography>
 
-                    {/* Years on air and run time */}
-                    {
-                        isHovering &&
-                        <Typography variant='body2'>{ yearsRun } • { runtime }</Typography>
-                    }
-
-                    {/* Schedule and country */}
+                    {/* Schedule */}
                     <Typography variant='body2'>
                         { schedule }
                     </Typography>
+
+                    {/* Years on air and run time */}
+                    {
+                        isHovering &&
+                        <Fragment>
+                            <Typography variant='body2'>
+                                { yearsRun }
+                            </Typography>
+                            <Typography variant='body2'>
+                                Average runtime: { runtime }
+                            </Typography>
+                        </Fragment>
+                    }
+
+
+                    {
+                        isHovering && officialSite &&
+                        <a href={ officialSite }>
+                            <Typography
+                                    variant='body2'
+                                    className={ classes.emphasis }>
+                                { officialSite }
+                            </Typography>
+                        </a>
+                    }
                 </div>
                 <div>
                     <StatusBadge text={ show.status } />
