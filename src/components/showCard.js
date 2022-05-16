@@ -5,6 +5,7 @@ import ImgPlaceHolder from '../static/image-placeholder.png'
 import { RUNNING, TRANSITION_DURATION_SECONDS } from '../constants'
 import Badge, { RatingBadge, StatusBadge } from './badge'
 import { isMobile } from 'react-device-detect'
+import ReactCountryFlag from 'react-country-flag'
 
 const OPENED_SHOW_WIDTH = '700px'
 
@@ -115,6 +116,8 @@ const parseRuntime = runtime => {
     return parsedTime
 }
 
+const joinList = list => list.reduce((acc, val) => acc += ', ' + val)
+
 export const ShowCard = props => {
     const { show } = props
 
@@ -130,6 +133,9 @@ export const ShowCard = props => {
                             ? show.webChannel.name
                             : null
 
+    let avgRating = show.rating.average
+    if (!avgRating.toString().includes('.')) avgRating += '.0'
+
     const summary = parse(show.summary)
 
     const runtime = parseRuntime(show.runtime)
@@ -139,8 +145,27 @@ export const ShowCard = props => {
                         : ImgPlaceHolder
                         
     const genres = show.genres && show.genres.length > 0
-                    ? show.genres.reduce((acc, val) => acc += ', ' + val)
+                    ? joinList(show.genres)
                     : null
+
+    const country = {
+        name: show.network?.country?.name
+                ? show.network.country.name
+                : show.webChannel?.country?.name
+                ? show.webChannel.country.name
+                : null,
+        code: show.network?.country?.code
+                ? show.network.country.code
+                : show.webChannel?.country?.code
+                ? show.webChannel.country.code
+                : null
+    }
+
+    const schedule = show.schedule?.time && show.schedule?.days?.length > 0
+                        ? <strong>
+                            { `${ joinList(show.schedule.days) }s at ${ show.schedule.time }` }
+                        </strong>
+                        : null
 
     const onMouseEnter = e => {
         e.preventDefault()
@@ -179,7 +204,12 @@ export const ShowCard = props => {
             <div id='showHeader'>
                 <div>
                     {/* Name */}
-                    <Typography variant='h2'>{ show.name }</Typography>
+                    <Typography variant='h2'>
+                        { show.name }&nbsp;
+                        <ReactCountryFlag
+                            countryCode={ country.code }
+                            aria-label={ country.name } />
+                    </Typography>
                     
                     {/* Genres */}
                     <Typography variant='body2' className={ classes.emphasis }>
@@ -191,12 +221,17 @@ export const ShowCard = props => {
                         isHovering &&
                         <Typography variant='body2'>{ yearsRun } • { runtime }</Typography>
                     }
+
+                    {/* Schedule and country */}
+                    <Typography variant='body2'>
+                        { schedule }
+                    </Typography>
                 </div>
                 <div>
                     <StatusBadge text={ show.status } />
 
                     {/* Average rating */}
-                    <RatingBadge text={ show.rating.average } />
+                    <RatingBadge text={ avgRating } />
 
                     {/* Network or channel */}
                     {
