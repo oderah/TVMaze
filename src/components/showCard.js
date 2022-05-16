@@ -3,7 +3,7 @@ import { Card, CardContent, CardMedia, makeStyles, Typography } from '@material-
 import parse from 'html-react-parser'
 import ImgPlaceHolder from '../static/image-placeholder.png'
 import { RUNNING, TRANSITION_DURATION_SECONDS } from '../constants'
-import Badge, { StatusBadge } from './badge'
+import Badge, { RatingBadge, StatusBadge } from './badge'
 import { isMobile } from 'react-device-detect'
 
 const OPENED_SHOW_WIDTH = '700px'
@@ -194,6 +194,9 @@ export const ShowCard = props => {
                 </div>
                 <div>
                     <StatusBadge text={ show.status } />
+
+                    {/* Average rating */}
+                    <RatingBadge text={ show.rating.average } />
 
                     {/* Network or channel */}
                     {

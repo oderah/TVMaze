@@ -44,6 +44,23 @@ export const StatusBadge = props => {
     </Typography>
 }
 
+export const RatingBadge = props => {
+    const { text } = props
+    const classes = useStyles()
+
+    const bgColor = text >= 7
+                    ? theme.palette.success.main
+                    : text < 7 && text >= 5
+                    ? theme.palette.warning.main
+                    : theme.palette.error.main
+
+    return <Typography variant='body2'
+                        className={ classes.badge }
+                        style={ { backgroundColor: bgColor } }>
+        { text }
+    </Typography>
+}
+
 const Badge = props => {
     const { text } = props
     const classes = useStyles()
