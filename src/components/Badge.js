@@ -1,7 +1,7 @@
 import React from 'react'
 import { makeStyles, Typography } from '@material-ui/core'
 import theme, { colors } from '../themes'
-import { RUNNING } from '../constants'
+import { ENDED, RUNNING } from '../constants'
 
 const useStyles = makeStyles(theme => ({
     statusBadge: {
@@ -24,9 +24,18 @@ export const StatusBadge = props => {
     const { text } = props
     const classes = useStyles({ text })
 
-    const bgColor = RUNNING === props.text
-                ? colors.onGoingShow
-                : theme.palette.secondary.main
+    let bgColor  = null
+
+    switch (text) {
+        case RUNNING:
+            bgColor = colors.onGoingShow
+            break
+        case ENDED:
+            bgColor = theme.palette.secondary.main
+            break
+        default:
+            bgColor = theme.palette.error.main
+    }
 
     return <Typography variant='body2'
                         className={ `${ classes.badge } ${ classes.statusBadge }` }

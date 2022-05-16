@@ -21,6 +21,9 @@ const useStyles = makeStyles(theme => ({
             overflowY: 'scroll',
             transition: `transform ${ TRANSITION_DURATION_SECONDS }s`,
             transformOrigin: 'top right',
+            '& #content': {
+                width: '100%'
+            },
             [ theme.breakpoints.down('sm') ]: {
                 transform: 'scale(1.05)'
             },
@@ -124,10 +127,11 @@ export const ShowCard = props => {
     const networkOrChannelName = show.network && show.network.name
                             ? show.network.name
                             : show.webChannel
-                            ? show.webChannel
+                            ? show.webChannel.name
                             : null
 
     const summary = parse(show.summary)
+
     const runtime = parseRuntime(show.runtime)
 
     const imageSrc = show.image
@@ -149,7 +153,6 @@ export const ShowCard = props => {
     }
 
     const onMobileClick = e => {
-        console.log('mobile clicking')
         if (!mobileClick) onMouseEnter(e)
         else onMouseLeave(e)
         setMobileClick(!mobileClick)
@@ -160,8 +163,9 @@ export const ShowCard = props => {
                         : null
 
 
-    return <Card className={ classes.root }
-                    // onClick={ onMouseEnter }
+    return !show
+            ? <div />
+            : <Card className={ classes.root }
                     onClick={ onTap }
                     onMouseEnter={ onMouseEnter }
                     onMouseLeave={ onMouseLeave }>

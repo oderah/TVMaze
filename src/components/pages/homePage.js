@@ -1,7 +1,7 @@
 import React from 'react'
 import ShowCard from '../showCard'
 import request from '../../services/apiService'
-import { AppBar, Container, Fade, Grid, IconButton, TextField, Toolbar, Typography } from '@material-ui/core'
+import { AppBar, Container, Grid, IconButton, Slide, TextField, Toolbar, Typography } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import SearchIcon from '@mui/icons-material/Search'
 import { TRANSITION_DURATION_MILLISECONDS } from '../../constants'
@@ -46,7 +46,9 @@ const initialState = {
     shows: [],
     cachedShows: [],
     page: 0,
-    showSearchField: false
+    showSearchField: false,
+    query: '',
+    searchResults: []
 }
 
 class HomePage extends React.Component {
@@ -62,7 +64,8 @@ class HomePage extends React.Component {
         await this.getShows()
     }
 
-    componentDidUpdate() {
+    async componentDidUpdate() {
+        await this.searchShow()
         window.addEventListener('scroll', this.scroll, {
           passive: true
         })
@@ -73,17 +76,39 @@ class HomePage extends React.Component {
     }
 
     mapShows = shows => shows.map(
-        show => <Grid item
-                        key={ show.id }
-                        xs={ 12 }
-                        sm={ 6 }
-                        md={ 4 }
-                        lg={ 3 }>
-            <ShowCard show={ show } />
-        </Grid>
-    ) 
+        aShow => {
+            const show = aShow.show
+                            ? aShow.show
+                            : aShow
+            return <Grid item
+                            key={ show.id }
+                            xs={ 12 }
+                            sm={ 6 }
+                            md={ 4 }
+                            lg={ 3 }>
+                        <ShowCard show={ show } />
+                    </Grid>
+        }
+    )
 
-    getShows = async () => {
+    searchShow = async () => {
+        const { query } = this.state
+        
+        if (query) {
+            const res = await request({
+                type: 'get',
+                url: `https://api.tvmaze.com/search/shows?q=${ query }`
+            })
+
+            if (!res) return
+
+            return this.setState({
+                searchResults: res.data
+            })
+        }
+    }
+
+    getShows = async () => {        
         const { shows, cachedShows, page } = this.state
 
         if (cachedShows.length > 0) {
@@ -127,8 +152,21 @@ class HomePage extends React.Component {
         }, 1000)
     }
 
+    updateQuery = e => {
+        e.preventDefault()
+        this.setState({
+            query: e.target.value
+        })
+    }
+
     render () {
-        const { shows, showSearchField } = this.state
+        const {
+            shows,
+            showSearchField,
+            query,
+            searchResults,
+            isFetching
+        } = this.state
         const { classes } = this.props
         return <Container className={ classes.root }>
             <AppBar position='static' color='secondary'>
@@ -144,9 +182,16 @@ class HomePage extends React.Component {
                     </Typography>
 
                     {/* Search field */}
-                    <Fade in={ showSearchField } timeout={ TRANSITION_DURATION_MILLISECONDS }>
-                        <TextField color='primary' variant='outlined' id='search' />
-                    </Fade>
+                    <Slide in={ showSearchField }
+                            direction='left'
+                            timeout={ TRANSITION_DURATION_MILLISECONDS }>
+                        <TextField
+                            color='primary'
+                            variant='outlined'
+                            id='search'
+                            value={ query }
+                            onChange={ this.updateQuery } />
+                    </Slide>
 
                     {/* Search button */}
                     <IconButton
@@ -160,8 +205,12 @@ class HomePage extends React.Component {
 
             {/* Shows */}
             <Grid container spacing={ 2 }>
+                {
+                    query &&
+                    this.mapShows(searchResults)
+                }
                 { 
-                    shows.length > 0 && this.mapShows(shows)
+                    !query && this.mapShows(shows)
                 }
             </Grid>
         </Container>
