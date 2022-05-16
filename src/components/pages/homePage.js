@@ -1,9 +1,8 @@
 import React from 'react'
 import ShowCard from '../showCard'
 import request from '../../services/apiService'
-import { AppBar, Container, Fade, Grid, Hidden, IconButton, TextField, Toolbar, Typography } from '@material-ui/core'
+import { AppBar, Container, Fade, Grid, IconButton, TextField, Toolbar, Typography } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
-import MenuIcon from '@mui/icons-material/Menu'
 import SearchIcon from '@mui/icons-material/Search'
 import { TRANSITION_DURATION_MILLISECONDS } from '../../constants'
 
@@ -23,7 +22,10 @@ const styles = theme => ({
                 display: 'flex',
                 '& #title': {
                     color: theme.palette.common.white,
-                    fontWeight: theme.typography.fontWeightBold
+                    fontWeight: theme.typography.fontWeightBold,
+                    [ theme.breakpoints.only('xs') ]: {
+                        fontSize: theme.typography.h2.fontSize
+                    },
                 },
                 '& > div:nth-child(2)': {
                     marginLeft: theme.spacing(2),
@@ -131,15 +133,6 @@ class HomePage extends React.Component {
         return <Container className={ classes.root }>
             <AppBar position='static' color='secondary'>
                 <Toolbar>
-                    {/* Menu button */}
-                    <Hidden smUp>
-                        <IconButton
-                            edge='start'
-                            color='inherit'
-                            aria-label='open drawer'>
-                            <MenuIcon />
-                        </IconButton>
-                    </Hidden>
 
                     {/* Page title */}
                     <Typography
