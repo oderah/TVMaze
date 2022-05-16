@@ -164,8 +164,7 @@ class HomePage extends React.Component {
             shows,
             showSearchField,
             query,
-            searchResults,
-            isFetching
+            searchResults
         } = this.state
         const { classes } = this.props
         return <Container className={ classes.root }>

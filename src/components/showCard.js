@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import { Card, CardContent, CardMedia, makeStyles, Typography } from '@material-ui/core'
 import parse from 'html-react-parser'
 import ImgPlaceHolder from '../static/image-placeholder.png'
@@ -6,6 +6,8 @@ import { RUNNING, TRANSITION_DURATION_SECONDS } from '../constants'
 import Badge, { RatingBadge, StatusBadge } from './badge'
 import { isMobile } from 'react-device-detect'
 import ReactCountryFlag from 'react-country-flag'
+import request from '../services/apiService'
+import Episode from './episode'
 
 const OPENED_SHOW_WIDTH = '700px'
 
@@ -22,8 +24,9 @@ const useStyles = makeStyles(theme => ({
             overflowY: 'scroll',
             transition: `transform ${ TRANSITION_DURATION_SECONDS }s`,
             transformOrigin: 'top right',
-            '& #content': {
-                width: '100%'
+            '& #content, & > div:first-child': {
+                width: '100%',
+                display: 'flex'
             },
             [ theme.breakpoints.down('sm') ]: {
                 transform: 'scale(1.05)'
@@ -46,8 +49,6 @@ const useStyles = makeStyles(theme => ({
             },
             [ theme.breakpoints.up('md') ]: {
                 transform: 'scale(1.25)',
-                display: 'flex',
-                flexDirection: 'row',
                 width: OPENED_SHOW_WIDTH,
                 '& img': {
                     height: '100%',
@@ -65,6 +66,10 @@ const useStyles = makeStyles(theme => ({
             fontWeight: theme.typography.body2.fontWeight,
             lineHeight: theme.typography.body2.lineHeight,
             letterSpacing: theme.typography.body2.letterSpacing,
+        },
+        '& #episodes > h3': {
+            textAlign: 'left',
+            padding: theme.spacing(2)
         },
         '& hr': {
             opacity: 0.6
@@ -122,7 +127,8 @@ export const ShowCard = props => {
     const { show } = props
 
     const [ isHovering, setIsHovering ] = useState(false)
-    const [ mobileClick, setMobileClick ] = useState(false) 
+    const [ mobileClick, setMobileClick ] = useState(false)
+    const [ episodes, setEpisodes ] = useState([])
 
     const classes = useStyles({ id: show.id })
 
@@ -191,6 +197,31 @@ export const ShowCard = props => {
                         ? onMobileClick
                         : null
 
+    const fetchEpisodes = async () => {
+        const res = await request({
+            type: 'get',
+            url: `https://api.tvmaze.com/shows/${ show.id }/episodes`
+        })
+
+        if (!res) return
+
+        setEpisodes(res.data.map(episode => <Episode key={ episode.id } episode={ episode } />))
+    }
+
+    useEffect(() => {
+        fetchEpisodes()
+    })
+
+    const Summary = () => <div id='summary'>
+                                { summary }
+                            </div>
+
+    const Episodes = () => <div id='episodes'>
+                                <Typography variant='h3'>
+                                    Episodes
+                                </Typography>
+                                { episodes }
+                            </div>
 
     return !show
             ? <div />
@@ -198,80 +229,91 @@ export const ShowCard = props => {
                     onClick={ onTap }
                     onMouseEnter={ onMouseEnter }
                     onMouseLeave={ onMouseLeave }>
-
-        <CardMedia
-            component='img'
-            image={ imageSrc }
-            alt={ `${ show.name } poster` } />
-
-        <CardContent id='content'>
-            <div id='showHeader'>
                 <div>
-                    {/* Name */}
-                    <Typography variant='h2'>
-                        { show.name }&nbsp;
-                        <ReactCountryFlag
-                            countryCode={ country.code }
-                            aria-label={ country.name } />
-                    </Typography>
-                    
-                    {/* Genres */}
-                    <Typography variant='body2' className={ classes.emphasis }>
-                        { genres }
-                    </Typography>
+                    <CardMedia
+                        component='img'
+                        image={ imageSrc }
+                        alt={ `${ show.name } poster` } />
 
-                    {/* Schedule */}
-                    <Typography variant='body2'>
-                        { schedule }
-                    </Typography>
+                    <CardContent id='content'>
+                        <div>
+                            <div id='showHeader'>
+                                <div>
+                                    {/* Name */}
+                                    <Typography variant='h2'>
+                                        { show.name }&nbsp;
+                                        <ReactCountryFlag
+                                            countryCode={ country.code }
+                                            aria-label={ country.name } />
+                                    </Typography>
+                                    
+                                    {/* Genres */}
+                                    <Typography variant='body2' className={ classes.emphasis }>
+                                        { genres }
+                                    </Typography>
 
-                    {/* Years on air and run time */}
+                                    {/* Schedule */}
+                                    <Typography variant='body2'>
+                                        { schedule }
+                                    </Typography>
+
+                                    {/* Years on air and run time */}
+                                    {
+                                        isHovering &&
+                                        <Fragment>
+                                            <Typography variant='body2'>
+                                                { yearsRun }
+                                            </Typography>
+                                            <Typography variant='body2'>
+                                                Average runtime: { runtime }
+                                            </Typography>
+                                        </Fragment>
+                                    }
+
+
+                                    {
+                                        isHovering && officialSite &&
+                                        <a href={ officialSite }>
+                                            <Typography
+                                                    variant='body2'
+                                                    className={ classes.emphasis }>
+                                                { officialSite }
+                                            </Typography>
+                                        </a>
+                                    }
+                                </div>
+                                <div>
+                                    <StatusBadge text={ show.status } />
+
+                                    {/* Average rating */}
+                                    <RatingBadge text={ avgRating } />
+
+                                    {/* Network or channel */}
+                                    {
+                                        isHovering && networkOrChannelName &&
+                                        <Badge text={ networkOrChannelName } />
+                                    }
+                                </div>
+                            </div>
+
+                        {/* Summary */}
+                        {
+                            isHovering &&
+                            <Summary />
+                        }
+                        </div>
+
+
+                    </CardContent>
+                </div>
+                <div>
+                    {/* Episodes */}
                     {
                         isHovering &&
-                        <Fragment>
-                            <Typography variant='body2'>
-                                { yearsRun }
-                            </Typography>
-                            <Typography variant='body2'>
-                                Average runtime: { runtime }
-                            </Typography>
-                        </Fragment>
-                    }
-
-
-                    {
-                        isHovering && officialSite &&
-                        <a href={ officialSite }>
-                            <Typography
-                                    variant='body2'
-                                    className={ classes.emphasis }>
-                                { officialSite }
-                            </Typography>
-                        </a>
+                        <Episodes />
                     }
                 </div>
-                <div>
-                    <StatusBadge text={ show.status } />
-
-                    {/* Average rating */}
-                    <RatingBadge text={ avgRating } />
-
-                    {/* Network or channel */}
-                    {
-                        isHovering && networkOrChannelName &&
-                        <Badge text={ networkOrChannelName } />
-                    }
-                </div>
-            </div>
-            {/* Summary */}
-            {
-                isHovering &&
-                <div id='summary'>
-                    { summary }
-                </div>
-            }
-        </CardContent>
-    </Card>
+            </Card>
 }
 
 export default ShowCard
