@@ -1,17 +1,29 @@
-import React, { Fragment, useState } from 'react'
+import React, { useState } from 'react'
 import { Card, CardContent, CardMedia, makeStyles, Typography } from '@material-ui/core'
 import parse from 'html-react-parser'
+import ImgPlaceHolder from '../static/image-placeholder.png'
+import { TRANSITION_DURATION_SECONDS } from '../constants'
 
 const useStyles = makeStyles(theme => ({
     root: {
-        backgroundColor: 'pink',
-        width: 'min-content',
-        maxHeight: '600px',
-        width: '250px',
+        backgroundColor: theme.palette.primary.main,
+        height: '500px',
         scrollbarWidth: 'none',
+        '& img': {
+            height: '400px'
+        },
         '&:hover': {
             transform: 'scale(1.25)',
-            overflowY: 'scroll'
+            overflowY: 'scroll',
+            display: 'flex',
+            flexDirection: 'row',
+            width: '700px',
+            transition: `transform ${ TRANSITION_DURATION_SECONDS }s`,
+            '& img': {
+                height: '100%',
+                width: 'auto',
+                transition: `height ${ TRANSITION_DURATION_SECONDS }s`
+            }
         },
         '& #content': {
             textAlign: 'left'
@@ -23,11 +35,22 @@ const useStyles = makeStyles(theme => ({
             lineHeight: theme.typography.body2.lineHeight,
             letterSpacing: theme.typography.body2.letterSpacing,
         },
+        '& #networkOrChannelName': {
+            textAlign: 'right'
+        },
         '& hr': {
             opacity: 0.6
         },
         '& #showHeader': {
-            display: 'flex'
+            display: 'flex',
+            '& > div': {
+                display: 'flex',
+                flexDirection: 'column',
+                '&:last-child': {
+                    textAlign: 'right',
+                    flexGrow: 1
+                }
+            }
         },
         '&::-webkit-scrollbar': {
             width: 0
@@ -81,9 +104,15 @@ export const ShowCard = props => {
 
     const summary = parse(show.summary)
     const runtime = parseRuntime(show.runtime)
+
+    const imageSrc = show.image
+                        ? show.image.medium
+                        : ImgPlaceHolder
+                        
     const genres = show.genres && show.genres.length > 0
                     ? show.genres.reduce((acc, val) => acc += ', ' + val)
                     : null
+
     const isAiring = 'Running' === show.status
                     ? 'airing'
                     : 'completed'
@@ -92,50 +121,55 @@ export const ShowCard = props => {
         e.preventDefault()
         setIsHovering(true)
     }
+
     const onMouseLeave = e => {
         e.preventDefault()
         setIsHovering(false)
     }
+
     return <Card className={ classes.root }
                     onMouseEnter={ onMouseEnter }
                     onMouseLeave={ onMouseLeave }>
 
         <CardMedia
             component='img'
-            image={ show.image.medium }
+            image={ imageSrc }
             alt={ `${ show.name } poster` } />
+
         <CardContent id='content'>
-
             <div id='showHeader'>
-                {/* Name */}
-                <Typography variant='h2'>{ show.id }</Typography>&nbsp;
-                <Typography variant='body2'>{ isAiring }</Typography>
-            </div>
-
-            {/* Genres */}
-            <Typography variant='body2' className={ classes.emphasis }>
-                { genres }
-            </Typography>
-
-            {
-                isHovering &&
-                <Fragment>
+                <div>
+                    {/* Name */}
+                    <Typography variant='h2'>{ show.name }</Typography>
+                    
+                    {/* Genres */}
+                    <Typography variant='body2' className={ classes.emphasis }>
+                        { genres }
+                    </Typography>
 
                     {/* Years on air and run time */}
-                    <Typography variant='body2'>{ yearsRun } • { runtime }</Typography>
-
+                    {
+                        isHovering &&
+                        <Typography variant='body2'>{ yearsRun } • { runtime }</Typography>
+                    }
+                </div>
+                {/* <div style={{backgroundColor: 'blue'}}> */}
+                <div>
+                    <Typography variant='body2'>{ isAiring }</Typography>
+                    
                     {/* Networ or channel */}
                     {
-                        networkOrChannelName &&
-                        <Typography variant='body2'>{ networkOrChannelName }</Typography>
+                        isHovering && networkOrChannelName &&
+                        <Typography id='networkOrChannelName' variant='body2'>{ networkOrChannelName }</Typography>
                     }
-
-                    {/* Summary */}
-                    <hr />
-                    <div id='summary'>
-                        { summary }
-                    </div>
-                </Fragment>
+                </div>
+            </div>
+            {/* Summary */}
+            {
+                isHovering &&
+                <div id='summary'>
+                    { summary }
+                </div>
             }
         </CardContent>
     </Card>

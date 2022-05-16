@@ -1,24 +1,21 @@
 import { createTheme } from "@material-ui/core"
 
 export const colors = {
-    red: '#BA0913',
-    blue: '#0E2234',
-    light_blue: '#75B7BB',
-    cream: '#E7EAE1',
-    item_hover: '#EEEEEE',
-    link: '#0D6EFD'
+    primary: '#E5B39A',
+    secondary: '#0E2234',
+    info: '#75B7BB'
 }
 
 const theme = createTheme({
     palette: {
         primary: {
-            main: colors.red
+            main: colors.primary
         },
         secondary: {
-            main: colors.blue
+            main: colors.secondary
         },
         info: {
-            main: colors.light_blue
+            main: colors.info
         }
     },
     typography: {
