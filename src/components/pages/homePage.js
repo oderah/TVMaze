@@ -1,7 +1,7 @@
 import React from 'react'
 import ShowCard from '../showCard'
 import request from '../../services/apiService'
-import { AppBar, Container, Fade, Grid, Hidden, IconButton, Slide, TextField, Toolbar, Typography } from '@material-ui/core'
+import { AppBar, Container, Fade, Grid, Hidden, IconButton, TextField, Toolbar, Typography } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import MenuIcon from '@mui/icons-material/Menu'
 import SearchIcon from '@mui/icons-material/Search'
@@ -50,6 +50,7 @@ const initialState = {
 class HomePage extends React.Component {
     constructor(props) {
         super(props)
+        this.lastScrollPosition = 0
         this.state = {
             ...initialState
         }
@@ -59,16 +60,21 @@ class HomePage extends React.Component {
         await this.getShows()
     }
 
+    componentDidUpdate() {
+        window.addEventListener('scroll', this.scroll, {
+          passive: true
+        })
+    }
+    
+    componentWillUnmount() {
+        window.removeEventListener('scroll', this.scroll)
+    }
+
     mapShows = shows => shows.map(
         show => <Grid key={ show.id } item xs={ 3 }>
             <ShowCard show={ show } />
         </Grid>
-    )
-
-    loadMoreShows = async (e) => {
-        e.preventDefault()
-        await this.getShows()
-    } 
+    ) 
 
     getShows = async () => {
         const { shows, cachedShows, page } = this.state
@@ -103,8 +109,12 @@ class HomePage extends React.Component {
         })
     }
 
-    scroll = e => {
-        console.log('scrolling', e)
+    scroll = async (e) => {
+        e.preventDefault()
+        const atTheBottom = Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight
+        const scrollDown = window.scrollY > this.lastScrollPosition
+        if (atTheBottom && scrollDown) await this.getShows()
+        this.lastScrollPosition = window.scrollY
     }
 
     render () {
@@ -155,7 +165,6 @@ class HomePage extends React.Component {
                     shows.length > 0 && this.mapShows(shows)
                 }
             </Grid>
-            <button onClick={ this.loadMoreShows }>Load More</button>
         </Container>
     }
 }
