@@ -3,7 +3,7 @@ import { Card, CardContent, CardMedia, makeStyles, Typography } from '@material-
 import parse from 'html-react-parser'
 import ImgPlaceHolder from '../static/image-placeholder.png'
 import { TRANSITION_DURATION_SECONDS } from '../constants'
-import Badge, { StatusBadge } from './Badge'
+import Badge, { StatusBadge } from './badge'
 
 const useStyles = makeStyles(theme => ({
     root: {

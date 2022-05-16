@@ -1,5 +1,5 @@
 import React from 'react'
-import { Badge as MuiBadge, makeStyles, Typography } from '@material-ui/core'
+import { makeStyles, Typography } from '@material-ui/core'
 import theme, { colors } from '../themes'
 
 const RUNNING = 'Running'
