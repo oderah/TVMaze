@@ -3,6 +3,7 @@ import { Card, CardContent, CardMedia, makeStyles, Typography } from '@material-
 import parse from 'html-react-parser'
 import ImgPlaceHolder from '../static/image-placeholder.png'
 import { TRANSITION_DURATION_SECONDS } from '../constants'
+import Badge, { StatusBadge } from './Badge'
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -35,9 +36,6 @@ const useStyles = makeStyles(theme => ({
             lineHeight: theme.typography.body2.lineHeight,
             letterSpacing: theme.typography.body2.letterSpacing,
         },
-        '& #networkOrChannelName': {
-            textAlign: 'right'
-        },
         '& hr': {
             opacity: 0.6
         },
@@ -47,8 +45,8 @@ const useStyles = makeStyles(theme => ({
                 display: 'flex',
                 flexDirection: 'column',
                 '&:last-child': {
-                    textAlign: 'right',
-                    flexGrow: 1
+                    flexGrow: 1,
+                    alignItems: 'flex-end'
                 }
             }
         },
@@ -113,10 +111,6 @@ export const ShowCard = props => {
                     ? show.genres.reduce((acc, val) => acc += ', ' + val)
                     : null
 
-    const isAiring = 'Running' === show.status
-                    ? 'airing'
-                    : 'completed'
-
     const onMouseEnter = e => {
         e.preventDefault()
         setIsHovering(true)
@@ -153,14 +147,13 @@ export const ShowCard = props => {
                         <Typography variant='body2'>{ yearsRun } • { runtime }</Typography>
                     }
                 </div>
-                {/* <div style={{backgroundColor: 'blue'}}> */}
                 <div>
-                    <Typography variant='body2'>{ isAiring }</Typography>
-                    
-                    {/* Networ or channel */}
+                    <StatusBadge text={ show.status } />
+
+                    {/* Network or channel */}
                     {
                         isHovering && networkOrChannelName &&
-                        <Typography id='networkOrChannelName' variant='body2'>{ networkOrChannelName }</Typography>
+                        <Badge text={ networkOrChannelName } />
                     }
                 </div>
             </div>

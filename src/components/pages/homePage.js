@@ -129,7 +129,6 @@ class HomePage extends React.Component {
                     {/* Menu button */}
                     <Hidden smUp>
                         <IconButton
-                            size='large'
                             edge='start'
                             color='inherit'
                             aria-label='open drawer'>
@@ -153,7 +152,6 @@ class HomePage extends React.Component {
 
                     {/* Search button */}
                     <IconButton
-                        size='large'
                         color='inherit'
                         aria-label='search show'
                         onClick={ this.toggleSearchField }>

@@ -3,7 +3,8 @@ import { createTheme } from "@material-ui/core"
 export const colors = {
     primary: '#E5B39A',
     secondary: '#0E2234',
-    info: '#75B7BB'
+    info: '#75B7BB',
+    onGoingShow: '#279107'
 }
 
 const theme = createTheme({
