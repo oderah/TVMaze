@@ -71,7 +71,12 @@ class HomePage extends React.Component {
     }
 
     mapShows = shows => shows.map(
-        show => <Grid key={ show.id } item xs={ 3 }>
+        show => <Grid item
+                        key={ show.id }
+                        xs={ 12 }
+                        sm={ 6 }
+                        md={ 4 }
+                        lg={ 3 }>
             <ShowCard show={ show } />
         </Grid>
     ) 

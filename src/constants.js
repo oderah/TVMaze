@@ -1,2 +1,3 @@
 export const TRANSITION_DURATION_SECONDS = 1
 export const TRANSITION_DURATION_MILLISECONDS = 1000
+export const RUNNING = 'Running'

@@ -2,28 +2,54 @@ import React, { useState } from 'react'
 import { Card, CardContent, CardMedia, makeStyles, Typography } from '@material-ui/core'
 import parse from 'html-react-parser'
 import ImgPlaceHolder from '../static/image-placeholder.png'
-import { TRANSITION_DURATION_SECONDS } from '../constants'
+import { RUNNING, TRANSITION_DURATION_SECONDS } from '../constants'
 import Badge, { StatusBadge } from './badge'
+import { isMobile } from 'react-device-detect'
+
+const OPENED_SHOW_WIDTH = '700px'
 
 const useStyles = makeStyles(theme => ({
     root: {
         backgroundColor: theme.palette.primary.main,
         height: '500px',
         scrollbarWidth: 'none',
+        overflowX: 'hidden',
         '& img': {
             height: '400px'
         },
-        '&:hover': {
-            transform: 'scale(1.25)',
+        '&:hover, &:active': {
             overflowY: 'scroll',
-            display: 'flex',
-            flexDirection: 'row',
-            width: '700px',
             transition: `transform ${ TRANSITION_DURATION_SECONDS }s`,
-            '& img': {
-                height: '100%',
-                width: 'auto',
-                transition: `height ${ TRANSITION_DURATION_SECONDS }s`
+            transformOrigin: 'top right',
+            [ theme.breakpoints.down('sm') ]: {
+                transform: 'scale(1.05)'
+            },
+            [ theme.breakpoints.only('md') ]: {
+                transformOrigin: props => (props.id - 1) % 3 === 0
+                                            ? 'top left'
+                                            : 'top right',
+                transform: props => (props.id -  1) % 3 === 0
+                                    ? 'scale(1.25)'
+                                    : 'translateX(-55%)',
+            },
+            [ theme.breakpoints.up('lg') ]: {
+                transformOrigin: props => (props.id - 1) % 4 < 2
+                                            ? 'top left'
+                                            : 'top right',
+                transform: props => (props.id -  1) % 4 === 0
+                                    ? 'scale(1.25)'
+                                    : 'translateX(-58%)',
+            },
+            [ theme.breakpoints.up('md') ]: {
+                transform: 'scale(1.25)',
+                display: 'flex',
+                flexDirection: 'row',
+                width: OPENED_SHOW_WIDTH,
+                '& img': {
+                    height: '100%',
+                    width: 'auto',
+                    transition: `height ${ TRANSITION_DURATION_SECONDS }s`
+                }
             }
         },
         '& #content': {
@@ -70,7 +96,7 @@ const useStyles = makeStyles(theme => ({
 
 const getYearsRun = (startDate, endDate, status) => {
     const startYear = new Date(startDate).getFullYear()
-    const endYear = 'Running' === status
+    const endYear = RUNNING === status
                     ? 'present'
                     : new Date(endDate).getFullYear()
     if (startYear === endYear) return `(${ startYear })`
@@ -90,8 +116,9 @@ export const ShowCard = props => {
     const { show } = props
 
     const [ isHovering, setIsHovering ] = useState(false)
+    const [ mobileClick, setMobileClick ] = useState(false) 
 
-    const classes = useStyles()
+    const classes = useStyles({ id: show.id })
 
     const yearsRun = getYearsRun(show.premiered, show.ended, show.status)
     const networkOrChannelName = show.network && show.network.name
@@ -121,7 +148,21 @@ export const ShowCard = props => {
         setIsHovering(false)
     }
 
+    const onMobileClick = e => {
+        console.log('mobile clicking')
+        if (!mobileClick) onMouseEnter(e)
+        else onMouseLeave(e)
+        setMobileClick(!mobileClick)
+    }
+
+    const onTap = isMobile
+                        ? onMobileClick
+                        : null
+
+
     return <Card className={ classes.root }
+                    // onClick={ onMouseEnter }
+                    onClick={ onTap }
                     onMouseEnter={ onMouseEnter }
                     onMouseLeave={ onMouseLeave }>
 

@@ -5,7 +5,7 @@ import HomePage from './components/pages/homePage';
 
 function App() {
   return (
-    <ThemeProvider theme={  theme }>
+    <ThemeProvider theme={ theme }>
       <div className="App">
         <HomePage />
       </div>

@@ -1,8 +1,7 @@
 import React from 'react'
 import { makeStyles, Typography } from '@material-ui/core'
 import theme, { colors } from '../themes'
-
-const RUNNING = 'Running'
+import { RUNNING } from '../constants'
 
 const useStyles = makeStyles(theme => ({
     statusBadge: {
@@ -13,7 +12,8 @@ const useStyles = makeStyles(theme => ({
         fontWeight: theme.typography.fontWeightBold,
         borderRadius: theme.shape.borderRadius,
         padding: `0 ${ theme.spacing(1) }px`,
-        marginBottom: theme.spacing(1)
+        marginBottom: theme.spacing(1),
+        whiteSpace: 'nowrap'
     },
     defaultBadge: {
         backgroundColor: theme.palette.info.main
