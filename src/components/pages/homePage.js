@@ -115,6 +115,9 @@ class HomePage extends React.Component {
         const scrollDown = window.scrollY > this.lastScrollPosition
         if (atTheBottom && scrollDown) await this.getShows()
         this.lastScrollPosition = window.scrollY
+        setTimeout(() => {
+            return
+        }, 1000)
     }
 
     render () {
