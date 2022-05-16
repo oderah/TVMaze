@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/TVMaze/static/css/main.abe6bf84.css",
-    "main.js": "/TVMaze/static/js/main.febfa7fc.js",
+    "main.js": "/TVMaze/static/js/main.da98e3a7.js",
     "static/js/787.9a4af6ef.chunk.js": "/TVMaze/static/js/787.9a4af6ef.chunk.js",
     "static/media/image-placeholder.png": "/TVMaze/static/media/image-placeholder.f17d23974f66f08046e0.png",
     "index.html": "/TVMaze/index.html",
     "main.abe6bf84.css.map": "/TVMaze/static/css/main.abe6bf84.css.map",
-    "main.febfa7fc.js.map": "/TVMaze/static/js/main.febfa7fc.js.map",
+    "main.da98e3a7.js.map": "/TVMaze/static/js/main.da98e3a7.js.map",
     "787.9a4af6ef.chunk.js.map": "/TVMaze/static/js/787.9a4af6ef.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.abe6bf84.css",
-    "static/js/main.febfa7fc.js"
+    "static/js/main.da98e3a7.js"
   ]
 }
