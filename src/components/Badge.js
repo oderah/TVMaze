@@ -55,7 +55,7 @@ export const RatingBadge = props => {
                     : theme.palette.error.main
 
     return <Typography variant='body2'
-                        className={ classes.badge }
+                        className={ `${ classes.badge } ${ classes.defaultBadge } ${ classes.statusBadge }` }
                         style={ { backgroundColor: bgColor } }>
         { text }
     </Typography>

@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react'
+import React, { Fragment, useState } from 'react'
 import { Card, CardContent, CardMedia, makeStyles, Typography } from '@material-ui/core'
 import parse from 'html-react-parser'
 import ImgPlaceHolder from '../static/image-placeholder.png'
@@ -6,7 +6,6 @@ import { RUNNING, TRANSITION_DURATION_SECONDS } from '../constants'
 import Badge, { RatingBadge, StatusBadge } from './badge'
 import { isMobile } from 'react-device-detect'
 import ReactCountryFlag from 'react-country-flag'
-import request from '../services/apiService'
 import Episode from './episode'
 
 const OPENED_SHOW_WIDTH = '700px'
@@ -17,19 +16,29 @@ const useStyles = makeStyles(theme => ({
         height: '500px',
         scrollbarWidth: 'none',
         overflowX: 'hidden',
-        '& img': {
+        '& > #card-content > img': {
             height: '400px'
         },
         '&:hover, &:active': {
             overflowY: 'scroll',
             transition: `transform ${ TRANSITION_DURATION_SECONDS }s`,
             transformOrigin: 'top right',
-            '& #content, & > div:first-child': {
+            '& #content, & #content > div, & > div:first-child': {
                 width: '100%',
                 display: 'flex'
             },
             [ theme.breakpoints.down('sm') ]: {
-                transform: 'scale(1.05)'
+                transform: 'scale(1.05)',
+                '& > div': {
+                    flexDirection: 'column'
+                },
+                '& img': {
+                    width: '100%',
+                    height: 'auto'
+                },
+                '& #content': {
+                    maxWidth: '92%',
+                }
             },
             [ theme.breakpoints.only('md') ]: {
                 transformOrigin: props => (props.id - 1) % 3 === 0
@@ -58,7 +67,10 @@ const useStyles = makeStyles(theme => ({
             }
         },
         '& #content': {
-            textAlign: 'left'
+            textAlign: 'left',
+            '& > div': {
+                flexDirection: 'column'
+            }
         },
         '& #summary': {
             fontSize: theme.typography.body2.fontSize,
@@ -75,6 +87,7 @@ const useStyles = makeStyles(theme => ({
             opacity: 0.6
         },
         '& #showHeader': {
+            width: '100%',
             display: 'flex',
             '& > div': {
                 display: 'flex',
@@ -128,7 +141,6 @@ export const ShowCard = props => {
 
     const [ isHovering, setIsHovering ] = useState(false)
     const [ mobileClick, setMobileClick ] = useState(false)
-    const [ episodes, setEpisodes ] = useState([])
 
     const classes = useStyles({ id: show.id })
 
@@ -140,9 +152,11 @@ export const ShowCard = props => {
                             : null
 
     let avgRating = show.rating.average
-    if (!avgRating.toString().includes('.')) avgRating += '.0'
+    if (avgRating && !avgRating.toString().includes('.')) avgRating += '.0'
 
-    const summary = parse(show.summary)
+    const summary = show.summary
+                    ? parse(show.summary)
+                    : ''
 
     const runtime = parseRuntime(show.runtime)
 
@@ -177,6 +191,10 @@ export const ShowCard = props => {
                             ? show.officialSite
                             : null
 
+    const episodes = !show.episodes
+                        ? []
+                        : show.episodes.map(episode => <Episode key={ episode.id } episode={ episode } />)
+
     const onMouseEnter = e => {
         e.preventDefault()
         setIsHovering(true)
@@ -197,21 +215,6 @@ export const ShowCard = props => {
                         ? onMobileClick
                         : null
 
-    const fetchEpisodes = async () => {
-        const res = await request({
-            type: 'get',
-            url: `https://api.tvmaze.com/shows/${ show.id }/episodes`
-        })
-
-        if (!res) return
-
-        setEpisodes(res.data.map(episode => <Episode key={ episode.id } episode={ episode } />))
-    }
-
-    useEffect(() => {
-        fetchEpisodes()
-    })
-
     const Summary = () => <div id='summary'>
                                 { summary }
                             </div>
@@ -229,7 +232,7 @@ export const ShowCard = props => {
                     onClick={ onTap }
                     onMouseEnter={ onMouseEnter }
                     onMouseLeave={ onMouseLeave }>
-                <div>
+                <div id='card-content'>
                     <CardMedia
                         component='img'
                         image={ imageSrc }
@@ -286,7 +289,10 @@ export const ShowCard = props => {
                                     <StatusBadge text={ show.status } />
 
                                     {/* Average rating */}
-                                    <RatingBadge text={ avgRating } />
+                                    {
+                                        avgRating &&
+                                        <RatingBadge text={ avgRating } />
+                                    }
 
                                     {/* Network or channel */}
                                     {
@@ -309,7 +315,7 @@ export const ShowCard = props => {
                 <div>
                     {/* Episodes */}
                     {
-                        isHovering &&
+                        // isHovering &&
                         <Episodes />
                     }
                 </div>

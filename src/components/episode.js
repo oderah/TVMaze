@@ -1,19 +1,31 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Card, CardContent, CardMedia, makeStyles, Typography } from '@material-ui/core'
 import parse from 'html-react-parser'
 import ImgPlaceHolder from '../static/image-placeholder.png'
 import { RatingBadge } from './badge'
-import { isMobile } from 'react-device-detect'
 
 const useStyles = makeStyles(theme => ({
     root: {
         display: 'flex',
         height: '150px',
-        '& #content': {
-            flexDirection: 'column'
+        marginBottom: theme.spacing(1),
+        '& #episode-image': {
+            width: '100%',
+            height: 'auto'
+        },
+        '& #episode-content': {
+            textAlign: 'left'
         },
         '& #header': {
-            display: 'flex'
+            display: 'flex',
+            '& h4': {
+                fontWeight: theme.typography.fontWeightBold
+            },
+            [ theme.breakpoints.down('sm') ] :{
+                '& p:last-child': {
+                    alignSelf: 'baseline'
+                }
+            },
         },
         '& #runtime': {
             flexGrow: 1
@@ -24,10 +36,12 @@ const useStyles = makeStyles(theme => ({
         },
         '& #summary': {
             width: '100%',
+            height: '50%',
             overflow: 'unset',
             overflowY: 'scroll',
             textOverflow: 'unset',
             scrollbarWidth: 'none',
+            paddingBottom: theme.spacing(1),
             '&::-webkit-scrollbar': {
                 width: 0
             },
@@ -39,6 +53,23 @@ const useStyles = makeStyles(theme => ({
             },
             '&::-o-scrollbar': {
                 width: 0
+            }
+        },
+        [ theme.breakpoints.down('sm') ]: {
+            flexDirection: 'column',
+            height: 'unset',
+            '& #episode-image': {
+                width: 'auto'
+            },
+            '& #runtime': {
+                whiteSpace: 'nowrap',
+                marginRight: theme.spacing(1)
+            }
+        },
+        [ theme.breakpoints.up('md') ]: {
+            '& #episode-image': {
+                height: '100%',
+                width: 'auto'
             }
         }
     }
@@ -56,9 +87,6 @@ const parseRuntime = runtime => {
 export const Episode = props => {
     const { episode } = props
 
-    const [ isHovering, setIsHovering ] = useState(false)
-    const [ mobileClick, setMobileClick ] = useState(false) 
-
     const classes = useStyles()
 
     const title = `S${ episode.season }E${ episode.number } ${ episode.name }`
@@ -66,7 +94,9 @@ export const Episode = props => {
     let avgRating = episode.rating.average
     if (avgRating && !avgRating.toString().includes('.')) avgRating += '.0'
 
-    const summary = parse(episode.summary)
+    const summary = episode.summary
+                    ? parse(episode.summary)
+                    : ''
 
     const runtime = parseRuntime(episode.runtime)
 
@@ -79,40 +109,17 @@ export const Episode = props => {
                     ? episode.url
                     : null
 
-    const onMouseEnter = e => {
-        e.preventDefault()
-        setIsHovering(true)
-    }
-
-    const onMouseLeave = e => {
-        e.preventDefault()
-        setIsHovering(false)
-    }
-
-    const onMobileClick = e => {
-        if (!mobileClick) onMouseEnter(e)
-        else onMouseLeave(e)
-        setMobileClick(!mobileClick)
-    }
-
-    const onTap = isMobile
-                        ? onMobileClick
-                        : null
-
-
     return !episode
             ? <div />
-            : <Card className={ classes.root }
-                    onClick={ onTap }
-                    onMouseEnter={ onMouseEnter }
-                    onMouseLeave={ onMouseLeave }>
+            : <Card className={ classes.root }>
 
         <CardMedia
             component='img'
             image={ imageSrc }
+            id='episode-image'
             alt={ `${ episode.name } poster` } />
 
-        <CardContent id='content'>
+        <CardContent id='episode-content'>
             <div id='header'>
                 {/* Title */}
                 <Typography variant='h4'>
