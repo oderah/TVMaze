@@ -315,7 +315,7 @@ export const ShowCard = props => {
                 <div>
                     {/* Episodes */}
                     {
-                        // isHovering &&
+                        isHovering &&
                         <Episodes />
                     }
                 </div>

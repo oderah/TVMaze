@@ -26,7 +26,8 @@ const styles = theme => ({
                     color: theme.palette.common.white,
                     fontWeight: theme.typography.fontWeightBold,
                     [ theme.breakpoints.only('xs') ]: {
-                        fontSize: theme.typography.h4.fontSize
+                        fontSize: theme.typography.h4.fontSize,
+                        width: '100px'
                     },
                     [ theme.breakpoints.only('sm') ]: {
                         fontSize: theme.typography.h3.fontSize
