@@ -53,7 +53,6 @@ const styles = theme => ({
 
 const initialState = {
     shows: [],
-    mappedShows: [],
     cachedShows: [],
     page: 0,
     showSearchField: false,
@@ -137,16 +136,20 @@ class HomePage extends React.Component {
     }
 
     getShows = async () => {  
-        this.setState({ isFetching: true })
-        
         const { shows, cachedShows, page } = this.state
-
+        
+        if (shows.length === 0) this.setState({
+            isFetching: true
+        })
+        
         if (cachedShows.length > 0) {
             this.setState({
-                shows: shows.concat(cachedShows.pop())
+                shows: shows.concat(await Promise.all(this.mapShows(cachedShows.pop())))
             })
             return
         }
+        
+        console.log('jkhkhkh')
 
         const res = await request({
             type: 'get',
@@ -158,16 +161,12 @@ class HomePage extends React.Component {
         let dataToCache = _.chunk(res.data, CHUNK_SIZE)
         dataToCache.reverse()
         this.setState({ 
-            shows: shows.concat(dataToCache.pop()),
+            shows: shows.concat(await Promise.all(this.mapShows(dataToCache.pop()))),
             cachedShows: dataToCache,
             page: page + 1
-        }, async () => {
-            this.setState({
-                mappedShows: await Promise.all(this.mapShows(this.state.shows)),
-            }, () => {
-                this.setState({ isFetching: false })
-            })
-        })
+        }, () => this.setState({
+            isFetching: false
+        }))
     }
 
     scroll = async (e) => {
@@ -194,7 +193,7 @@ class HomePage extends React.Component {
 
     render () {
         const {
-            mappedShows,
+            shows,
             isFetching,
             query,
             searchResults
@@ -249,7 +248,7 @@ class HomePage extends React.Component {
                     }
                     { 
                         (!query || searchResults.length === 0) &&
-                        mappedShows
+                        shows
                     }
                 </Grid>
             }
